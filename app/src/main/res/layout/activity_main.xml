@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
             android:ems="10"
-            android:text="50"
+            android:text=".250"
             android:id="@+id/marriage_percent_edit_text"
             android:layout_weight=".5"/>
     </LinearLayout>
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
             android:ems="10"
-            android:text="50"
+            android:text=".050"
             android:id="@+id/death_percent_edit_text"
             android:layout_weight=".5"/>
     </LinearLayout>
