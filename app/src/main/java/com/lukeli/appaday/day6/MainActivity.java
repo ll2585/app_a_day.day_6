@@ -35,11 +35,11 @@ import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity {
     private FragmentTabHost mTabHost;
-    private ArrayList<String> people = new ArrayList<String>();
-    private ArrayList<String> men = new ArrayList<String>();
-    private ArrayList<String> women = new ArrayList<String>();
-    private ArrayList<String> married = new ArrayList<String>();
-    private ArrayList<String> deceased = new ArrayList<String>();
+    private ArrayList<Person> people = new ArrayList<Person>();
+    private ArrayList<Person> men = new ArrayList<Person>();
+    private ArrayList<Person> women = new ArrayList<Person>();
+    private ArrayList<Person> married = new ArrayList<Person>();
+    private ArrayList<Person> deceased = new ArrayList<Person>();
     private TabbedFragment tab1;
     private TabbedFragment tab2;
     private TabbedFragment tab3;
@@ -55,7 +55,7 @@ public class MainActivity extends FragmentActivity {
         mTabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
         mTabHost.setup(this, getSupportFragmentManager(), android.R.id.tabcontent);
         Bundle args = new Bundle();
-        args.putStringArrayList("people", people);
+        args.putParcelableArrayList("people", people);
         mTabHost.addTab(
                 mTabHost.newTabSpec("tab1").setIndicator("All", null),
                 TabbedFragment.class, args);
@@ -89,21 +89,21 @@ public class MainActivity extends FragmentActivity {
         TabbedFragment curTab = (TabbedFragment) getSupportFragmentManager().findFragmentById(android.R.id.tabcontent);
         String tabId = curTab.getTag();
         Bundle args = new Bundle();
-        ArrayList<String> toSend = new ArrayList<String>();
+        ArrayList<Person> toSend = new ArrayList<Person>();
         if(tabId.equals("tab1")){
-            args.putStringArrayList("people", people);
+            args.putParcelableArrayList("people", people);
             toSend = people;
         }else if(tabId.equals("tab2") ){
-            args.putStringArrayList("people", men);
+            args.putParcelableArrayList("people", men);
             toSend = men;
         }else if(tabId.equals("tab3")){
-            args.putStringArrayList("people", women);
+            args.putParcelableArrayList("people", women);
             toSend = women;
         }else if(tabId.equals("tab4")){
-            args.putStringArrayList("people", married);
+            args.putParcelableArrayList("people", married);
             toSend = married;
         }else if(tabId.equals("tab5")){
-            args.putStringArrayList("people", deceased);
+            args.putParcelableArrayList("people", deceased);
             toSend = deceased;
         }
         curTab.getArguments().putAll(args);
@@ -202,7 +202,7 @@ public class MainActivity extends FragmentActivity {
 
                     JSONArray people_arr = jsonObject.getJSONArray("people");
 
-                    makePeopleStringArray(people_arr);
+                    makePeopleArray(people_arr);
                 }
 
 
@@ -222,27 +222,37 @@ public class MainActivity extends FragmentActivity {
             reloadTabs();
         }
 
-        protected void makePeopleStringArray(JSONArray jArray) {
-            people = new ArrayList<String>();
-            men = new ArrayList<String>();
-            women = new ArrayList<String>();
-            married = new ArrayList<String>();
-            deceased = new ArrayList<String>();
+        protected void makePeopleArray(JSONArray jArray) {
+            people = new ArrayList<Person>();
+            men = new ArrayList<Person>();
+            women = new ArrayList<Person>();
+            married = new ArrayList<Person>();
+            deceased = new ArrayList<Person>();
             try {
                 for(int i = 0 ; i < jArray.length(); i++){
                     JSONObject person = jArray.getJSONObject(i);
+                    //System.out.println(person);
+                    int id = person.getInt("id");
                     String personInfo = person.getString("name");
-                    people.add(personInfo);
+                    int age = person.getInt("age");
+                    boolean is_married = person.has("married");
+                    boolean is_deceased = person.has("dead");
+                    int spouse_id = -1;
+                    if(is_married && person.has("spouse")){
+                        spouse_id = person.getInt("spouse");
+                    }
+                    Person p = new Person(id, personInfo, age, is_married, is_deceased, spouse_id);
+                    people.add(p);
                     if(person.getString("gender").equals("M")){
-                        men.add(personInfo);
+                        men.add(p);
                     }else{
-                        women.add(personInfo);
+                        women.add(p);
                     }
-                    if(person.has("married")){
-                        married.add(personInfo);
+                    if(is_married){
+                        married.add(p);
                     }
-                    if(person.has("dead")){
-                        deceased.add(personInfo);
+                    if(is_deceased){
+                        deceased.add(p);
                     }
                 }
             } catch (JSONException e) {

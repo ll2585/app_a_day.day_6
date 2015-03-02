@@ -8,13 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
 public class TabbedFragment extends Fragment  {
-    ArrayList<String> people;
-    protected ArrayAdapter<String> adapter;
+    ArrayList<Person> people;
+    protected ArrayAdapter<Person> adapter;
     ListAdapter myAdapter;
     ListView myListView;
     @Override
@@ -26,19 +25,20 @@ public class TabbedFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_layout, container, false);
-        people = getArguments().getStringArrayList("people");
-        adapter = new ArrayAdapter<String>(getActivity(), R.layout.custom_person_row,
-                R.id.textView1, people);
+        people = getArguments().getParcelableArrayList("people");
+        //adapter = new ArrayAdapter<String>(getActivity(), R.layout.custom_person_row,
+        //        R.id.textView1, people);
+        adapter = new DeceasedAdapter(getActivity(), people);
+
         myListView = (ListView) v.findViewById(R.id.people_list_view);
         myListView.setAdapter(adapter);
         return v;
     }
 
-    public void setPeople(ArrayList<String> newPeople){
+    public void setPeople(ArrayList<Person> newPeople){
         adapter.notifyDataSetChanged();
-        people = getArguments().getStringArrayList("people");
-        adapter = new ArrayAdapter(getActivity(), R.layout.custom_person_row,
-                R.id.textView1, people);
+        people = getArguments().getParcelableArrayList("people");
+        adapter = new DeceasedAdapter(getActivity(), people);
         myListView = (ListView) getView().findViewById(R.id.people_list_view);
         myListView.setAdapter(adapter);
 
